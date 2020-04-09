@@ -40,7 +40,6 @@ all into one list of dictionaries
 function will take a list of ticket ids and output a columns of ticket data
 use Main() to pull id list from previous function
 """
-
 def chunk_ids_to_api_result(id_list):
     ticket_fields=("assignee_id","created_at","id","requester_id","updated_at")
     chunks = [id_list[x:x+100] for x in range(0, len(id_list), 100)] #breaks into 100 row slices for api limitation
@@ -55,7 +54,6 @@ def chunk_ids_to_api_result(id_list):
     return {field: [str(ticket[field]) for ticket in all_ticket_data] for field in ticket_fields}
 
 """Function exports the two dictionaries as a csv. Dictionaries are merged in main()"""
-
 def dict_to_csv(merged_dict):
     out_path = str(os.getcwd())+"/"+str(datetime.now())+"_palv2_output.csv"
     csv_out = zip(*merged_dict.values())
@@ -64,7 +62,7 @@ def dict_to_csv(merged_dict):
         writer.writerow(merged_dict.keys())
         writer.writerows(csv_out)
     print("exported to {}".format(out_path))
-    return csv_out
+
 
 def main():
     since_id = 0 #set start point for pagination
@@ -73,8 +71,11 @@ def main():
     links = response.json()["links"] #is a list of dictionaries with bug link data
     parsed_links = parse_links(response.json()["links"]) #loads data into dict
     all_ticket_data = chunk_ids_to_api_result(parsed_links.get('ticket_id')) #takes the ticket_ids and gets more ticket data from ZD showmany api
-    all_ticket_data.update(parsed_links) #merges both dicts together
-    dict_to_csv(all_ticket_data) #exports all to csv in cwd
+    parsed_links.update(all_ticket_data) #merges both dicts together
+    dict_to_csv(parsed_links) #exports all to csv in cwd
 
 if __name__ == "__main__":
+    start = time.time()
     main()
+    end = time.time()
+    print("Time Taken: {:.6f}s".format(end-start))
