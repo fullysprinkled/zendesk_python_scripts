@@ -54,18 +54,17 @@ def chunk_ids_to_api_result(id_list):
         chunk_count+=1
     return {field: [str(ticket[field]) for ticket in all_ticket_data] for field in ticket_fields}
 
-"""
-Function exports the two dictionaries as a csv. Dictionaries are merged in main()
-"""
+"""Function exports the two dictionaries as a csv. Dictionaries are merged in main()"""
 
 def dict_to_csv(merged_dict):
     out_path = str(os.getcwd())+"/"+str(datetime.now())+"_palv2_output.csv"
-    zd = zip(*merged_dict.values())
+    csv_out = zip(*merged_dict.values())
     with open(out_path, 'w') as file:
         writer = csv.writer(file, delimiter=',')
         writer.writerow(merged_dict.keys())
-        writer.writerows(zd)
+        writer.writerows(csv_out)
     print("exported to {}".format(out_path))
+    return csv_out
 
 def main():
     since_id = 0 #set start point for pagination
