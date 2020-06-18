@@ -44,12 +44,12 @@ def pull_all_zd_jira_links(links_response_json):
     return output
 
 """Creates a followup ticket for every ticket id in `ticket_ids`, sends `copy` to `form_id`"""
-def post_followup_tickets(form_id, copy, ticket_ids):
-    for ticket in ticket_ids:
-        data = {"ticket": {"via_followup_source_id": ticket_id, "comment": {"body": copy}, "ticket_form_id": form_id, "additional_tags":tags, "status":"pending"}}
+def post_followup_tickets(form_id, copy, subject, ticket_ids):
+    for ticket_id in ticket_ids:
+        data = {"ticket": {"via_followup_source_id": ticket_id, "subject": subject, "comment": {"body": copy}, "ticket_form_id": form_id, "status":"pending"}}
         print(data) #for debugging
         data=json.dumps(data)
-        response = session.post('https://animoto.zendesk.com/api/v2/tickets/update_many.json?ids=', headers=headers, data=data)
+        response = session.post('https://animoto.zendesk.com/api/v2/tickets.json', headers=headers, data=data)
         print(response,"\n",response.text) #for debugging
 
 def main():
@@ -63,11 +63,9 @@ def main():
     target_ticket_ids = tuple(links_df.iloc[(links_df['issue_key'] == target_jira).values].ticket_id) #tuple of all ticket ids where issue_key = target jira
     print(target_ticket_ids)
     followup_form_id = YOUR_FOLLOWUP_FORM_ID # the form ID you'll assign every ticket to
-    followup_copy = YOUR_FOLLOWUP_COPY_HERE #use markdown, this is will appear as a public comment for the followup ticket
-    post_followup_tickets(followup_form_id,followup_copy,target_ticket_ids)
+    followup_copy = YOUR_FOLLOWUP_COPY_HERE #use \n for paragraphs, this will appear as a public comment for the followup ticket
+    subject_copy = YOUR_SUBJECT_COPY_HERE #this is will appear as the subject line in the followup ticket
+    post_followup_tickets(followup_form_id,followup_copy,subject_copy,target_ticket_ids)
 
 if __name__ == "__main__":
-    start = time.time() 
     main()
-    end = time.time()
-    print("Time Taken: {:.6f}s".format(end-start))
