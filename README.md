@@ -1,2 +1,2 @@
-# zendesk_linked_bugs
-Scripts for extracting ticket and bug data via Zendesk's Jira integration API and more 
+# zendesk_api_scripts
+Scripts for extracting data via Zendesk's Jira integration API and more 
